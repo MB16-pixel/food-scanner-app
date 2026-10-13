@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown"; // 1. Import the parser
+import "./App.css";
 
 function App() {
+  // ... (keep all your existing state and functions the same)
   const [backendStatus, setBackendStatus] = useState("Connecting...");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Check backend health on load
   useEffect(() => {
     fetch("http://localhost:5000/api/health")
       .then((res) => res.json())
@@ -15,7 +17,6 @@ function App() {
       .catch(() => setBackendStatus("Failed to connect to backend"));
   }, []);
 
-  // Handle file selection (works with phone camera capture or photo library)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -25,10 +26,8 @@ function App() {
     }
   };
 
-  // Send image to backend
   const handleScan = async () => {
     if (!selectedFile) return;
-
     setLoading(true);
     setAnalysisResult("");
 
@@ -59,84 +58,44 @@ function App() {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "500px",
-        margin: "40px auto",
-        padding: "20px",
-        fontFamily: "sans-serif",
-      }}
-    >
+    <div className="scanner-container">
       <h2>Food Ingredient Scanner</h2>
-      <p style={{ fontSize: "14px", color: "#666" }}>
-        Backend status: {backendStatus}
-      </p>
+      {/* <p className="backend-status">Backend status: {backendStatus}</p> */}
+      <p>The result provided is AI generated, use with caution.</p>
 
-      <div
-        style={{
-          margin: "20px 0",
-          padding: "20px",
-          border: "2px dashed #ccc",
-          borderRadius: "8px",
-          textAlign: "center",
-        }}
-      >
+      <div className="upload-box">
         <input
           type="file"
           accept="image/*"
-          capture="environment" // Triggers phone camera directly on mobile browsers!
+          capture="environment"
           onChange={handleFileChange}
-          style={{ display: "block", margin: "10px auto" }}
+          className="file-input"
         />
 
         {previewUrl && (
-          <div style={{ marginTop: "15px" }}>
+          <div className="preview-container">
             <img
               src={previewUrl}
               alt="Ingredient Preview"
-              style={{
-                maxWidth: "100%",
-                maxHeight: "250px",
-                borderRadius: "4px",
-              }}
+              className="preview-image"
             />
           </div>
         )}
       </div>
 
       {selectedFile && (
-        <button
-          onClick={handleScan}
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: "12px",
-            background: "#007bff",
-            color: "#white",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={handleScan} disabled={loading} className="scan-button">
           {loading ? "Analyzing with Gemini..." : "Scan Ingredients"}
         </button>
       )}
 
       {analysisResult && (
-        <div
-          style={{
-            marginTop: "25px",
-            padding: "15px",
-            background: "#f8f9fa",
-            borderRadius: "8px",
-            border: "1px solid #ddd",
-          }}
-        >
+        <div className="report-box">
           <h3>Analysis Report:</h3>
-          <p style={{ whiteSpace: "pre-line", lineHeight: "1.5" }}>
-            {analysisResult}
-          </p>
+          {/* 2. Replace <p> with ReactMarkdown for clean formatting */}
+          <div className="report-text">
+            <ReactMarkdown>{analysisResult}</ReactMarkdown>
+          </div>
         </div>
       )}
     </div>
