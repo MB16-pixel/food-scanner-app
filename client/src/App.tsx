@@ -9,7 +9,7 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   // Define your production backend URL
-  const API_URL = "https://food-scanner-backend.onrender.com";
+  const API_URL = "https://food-scanner-app-q4mc.onrender.com";
 
   // Optional: Keeps health check running in the background to wake up Render's free tier server
   useEffect(() => {
