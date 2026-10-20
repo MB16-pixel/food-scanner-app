@@ -1,22 +1,22 @@
 import { useState, useEffect } from "react";
-import ReactMarkdown from "react-markdown"; // 1. Import the parser
+import ReactMarkdown from "react-markdown";
 import "./App.css";
 
 function App() {
-  // ... (keep all your existing state and functions the same)
-  const [backendStatus, setBackendStatus] = useState("Connecting...");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/health")
-      .then((res) => res.json())
-      .then((data) => setBackendStatus(data.message))
-      .catch(() => setBackendStatus("Failed to connect to backend"));
-  }, []);
+  // Define your production backend URL
+  const API_URL = "https://food-scanner-backend.onrender.com";
 
+  // Optional: Keeps health check running in the background to wake up Render's free tier server
+  useEffect(() => {
+    fetch(`${API_URL}/api/health`).catch(() => {});
+  }, [API_URL]);
+
+  // Handle file selection (works with phone camera capture or photo library)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -26,8 +26,10 @@ function App() {
     }
   };
 
+  // Send image to backend
   const handleScan = async () => {
     if (!selectedFile) return;
+
     setLoading(true);
     setAnalysisResult("");
 
@@ -35,13 +37,10 @@ function App() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/scan-ingredients",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
+      const response = await fetch(`${API_URL}/api/scan-ingredients`, {
+        method: "POST",
+        body: formData,
+      });
 
       const data = await response.json();
       if (response.ok) {
@@ -60,8 +59,9 @@ function App() {
   return (
     <div className="scanner-container">
       <h2>Food Ingredient Scanner</h2>
-      {/* <p className="backend-status">Backend status: {backendStatus}</p> */}
-      <p>The result provided is AI generated, use with caution.</p>
+      <p style={{ fontSize: "12px", color: "#666", marginBottom: "20px" }}>
+        The result provided is AI generated, use with caution.
+      </p>
 
       <div className="upload-box">
         <input
@@ -92,7 +92,6 @@ function App() {
       {analysisResult && (
         <div className="report-box">
           <h3>Analysis Report:</h3>
-          {/* 2. Replace <p> with ReactMarkdown for clean formatting */}
           <div className="report-text">
             <ReactMarkdown>{analysisResult}</ReactMarkdown>
           </div>
