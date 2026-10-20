@@ -34,7 +34,7 @@ app.post("/api/scan-ingredients", upload.single("image"), async (req, res) => {
     };
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       contents: [
         imagePart,
         "Analyze this food ingredient label. Extract the full ingredient list, flag any common allergens or unhealthy additives, and give a brief health safety summary. The brief health summary should be given in the beginning. Use colors to give a visual aid to give the safety spectrum",
