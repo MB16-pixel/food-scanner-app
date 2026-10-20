@@ -67,7 +67,7 @@ function App() {
         <input
           type="file"
           accept="image/*"
-          capture="environment"
+          // temporarily remove or comment out: capture="environment"
           onChange={handleFileChange}
           className="file-input"
         />
